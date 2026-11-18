@@ -32,7 +32,7 @@ import org.firstinspires.ftc.teamcode.tuning.FlywheelTuning;
 @TeleOp(name = "KQ Shooter Auto PID Test", group = "Test")
 public final class ShooterAutoTune extends LinearOpMode {
     public static double MAX_POWER = .65;
-    public static double MAX_RPM = 6500;
+    public static double MAX_RPM = 6503;
     public static double TARGET_RPM = 0; // 0 chooses 80% of measured top plateau.
     public static double TICKS_PER_REV = 28;
     private DcMotorEx leader, follower; // leader = shooterMotor1 (encoder), follower = shooterMotor2
