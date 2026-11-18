@@ -1,0 +1,71 @@
+package org.firstinspires.ftc.teamcode.subsystem;
+
+import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import org.firstinspires.ftc.teamcode.NameConstants;
+
+/** Intake 与 Transit 的联合输送机构。 */
+public class IntakeSubsystem extends SubsystemBase {
+    private final DcMotorEx intakeMotor;
+    private final DcMotorEx transitMotor;
+
+    private double intakePower;
+    private double transitPower;
+
+    public IntakeSubsystem(HardwareMap hardwareMap) {
+        intakeMotor = hardwareMap.get(DcMotorEx.class, NameConstants.INTAKE);
+        transitMotor = hardwareMap.get(DcMotorEx.class, NameConstants.TRANSIT);
+
+        intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        transitMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        transitMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        transitMotor.setDirection(DcMotor.Direction.REVERSE);
+    }
+
+    public void setPowers(double intakePower, double transitPower) {
+        this.intakePower = intakePower;
+        this.transitPower = transitPower;
+        intakeMotor.setPower(intakePower);
+        transitMotor.setPower(transitPower);
+    }
+
+    /** 射击状态机分别控制 Intake 与 Transit（移植自 OT 的独立 Intake/Transit 子系统）。 */
+    public void setIntakePower(double intakePower) {
+        this.intakePower = intakePower;
+        intakeMotor.setPower(intakePower);
+    }
+
+    public void setTransitPower(double transitPower) {
+        this.transitPower = transitPower;
+        transitMotor.setPower(transitPower);
+    }
+
+    /** 手动进料优先级：单独吸入 > 正向联动 > 反向联动。 */
+    public void applyManualControl(boolean intakeOnly, double forward, double reverse) {
+        if (intakeOnly) {
+            setPowers(1.0, 0.0);
+        } else if (forward > 0.05) {
+            setPowers(forward, forward);
+        } else if (reverse > 0.05) {
+            setPowers(-reverse, -reverse);
+        } else {
+            stop();
+        }
+    }
+
+    public void stop() {
+        setPowers(0.0, 0.0);
+    }
+
+    public double getIntakePower() {
+        return intakePower;
+    }
+
+    public double getTransitPower() {
+        return transitPower;
+    }
+}
